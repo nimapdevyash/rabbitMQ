@@ -1,27 +1,35 @@
-var amqp = require("amqplib/callback_api");
+const amqplib = require("amqplib");
 
-amqp.connect("amqp://yash:pass@localhost:8080", function (error0, connection) {
-  if (error0) {
-    throw error0;
-  }
-  connection.createChannel(function (error1, channel) {
-    if (error1) {
-      throw error1;
-    }
-    var queue = "hello";
-    var msg = "Hello world";
+async function sendMessage(msg = "Hello World !") {
+  try {
+    const connection = await amqplib.connect("amqp://yash:pass@localhost:8080");
+    const channel = await connection.createChannel();
 
-    channel.assertQueue(queue, {
+    const queue = "hello";
+    await channel.assertQueue(queue, {
       durable: false,
     });
 
     channel.sendToQueue(queue, Buffer.from(msg));
-    console.log(" [x] Sent %s", msg);
+    console.log(`Sent -> ${msg}`);
 
-    // Close the connection after ensuring the message is sent
-    setTimeout(function () {
-      connection.close();
-      process.exit(0);
-    }, 500);
-  });
-});
+    setTimeout(() => connection.close(), 800);
+  } catch (error) {
+    console.error("Error in Sending Message : ", error);
+  }
+}
+
+const arr = [
+  "some random message",
+  "some another random message",
+  "yet another one goes",
+  "somethings really serious is going on now",
+  "This is the End.....",
+];
+
+let i = 0;
+
+const ref = setInterval(
+  () => (i < arr.length ? sendMessage(arr[i++]) : clearInterval(ref)),
+  10
+);

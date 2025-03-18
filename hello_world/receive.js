@@ -1,29 +1,28 @@
-var amqp = require("amqplib/callback_api");
+const amqplib = require("amqplib");
 
-amqp.connect("amqp://yash:pass@localhost:8080", function (error0, connection) {
-  if (error0) {
-    throw error0;
-  }
-  connection.createChannel(function (error1, channel) {
-    if (error1) {
-      throw error1;
-    }
-    var queue = "hello";
+async function receiveMessage() {
+  try {
+    const connection = await amqplib.connect("amqp://yash:pass@localhost:8080");
+    const channel = await connection.createChannel();
 
-    channel.assertQueue(queue, {
-      durable: false,
-    });
+    const queue = "hello";
+    await channel.assertQueue(queue, { durable: false });
 
-    console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
+    console.log("Waiting for messages...");
 
     channel.consume(
       queue,
-      function (msg) {
-        console.log(" [x] Received %s", msg.content.toString());
+      (msg) => {
+        if (msg !== null) {
+          console.log(`Received -> ${msg.content.toString()}`);
+          channel.ack(msg); // Acknowledge the message
+        }
       },
-      {
-        noAck: true,
-      }
+      { noAck: false }
     );
-  });
-});
+  } catch (error) {
+    console.error("Error in receiveMessage:", error);
+  }
+}
+
+receiveMessage();
