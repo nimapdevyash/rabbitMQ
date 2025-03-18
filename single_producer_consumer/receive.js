@@ -10,16 +10,12 @@ async function receiveMessage() {
 
     console.log("Waiting for messages...");
 
-    channel.consume(
-      queue,
-      (msg) => {
-        if (msg !== null) {
-          console.log(`Received -> ${msg.content.toString()}`);
-          channel.ack(msg); // Acknowledge the message
-        }
-      },
-      { noAck: false }
-    );
+    channel.consume(queue, (msg) => {
+      if (msg !== null) {
+        console.log(`Received -> ${msg.content.toString()}`);
+        channel.ack(msg); // Acknowledge the message
+      }
+    });
   } catch (error) {
     console.error("Error in receiveMessage:", error);
   }
