@@ -11,7 +11,7 @@ This repository contains small projects built while learning **RabbitMQ**. Each 
 Start a RabbitMQ container with authentication:
 
 ```sh
-docker run -d --hostname my-rabbit --name rmq -p 5672:5672 -p 15672:15672 \
+docker run -d --hostname my-rabbit --name rmq -p 8080:5672 \
   -e RABBITMQ_DEFAULT_USER=yash \
   -e RABBITMQ_DEFAULT_PASS=pass \
   rabbitmq:management
